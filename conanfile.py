@@ -45,12 +45,23 @@ class LibuvConan(ConanFile):
             if self.settings.compiler == "Visual Studio":
                 env_vars["GYP_MSVS_VERSION"] = {"14": "2015",
                                                 "15": "2017"}.get(str(self.settings.compiler.version))
-            with tools.environment_append(env_vars):
-                target_arch = {"x86": "ia32", "x86_64": "x64"}.get(str(self.settings.arch))
-                uv_library = "shared_library" if self.options.shared else "static_library"
-                self.run("python gyp_uv.py -f ninja -Dtarget_arch=%s -Duv_library=%s"
-                         % (target_arch, uv_library))
-                self.run("ninja -C out/%s" % self.settings.build_type)
+
+            if tools.os_info.is_windows and \
+               (self.settings.compiler == "gcc" or self.settings.compiler == "clang"):
+                # todo: check for shared/static, arch,...
+                self.run("./autogen.sh", win_bash=True)
+                from conans import AutoToolsBuildEnvironment
+                autotools = AutoToolsBuildEnvironment(self, win_bash=True)
+                autotools.configure()
+                autotools.make()
+                autotools.install()
+            else:
+                with tools.environment_append(env_vars):
+                    target_arch = {"x86": "ia32", "x86_64": "x64"}.get(str(self.settings.arch))
+                    uv_library = "shared_library" if self.options.shared else "static_library"
+                    self.run("python gyp_uv.py -f ninja -Dtarget_arch=%s -Duv_library=%s"
+                             % (target_arch, uv_library))
+                    self.run("ninja -C out/%s" % self.settings.build_type)
 
     def package(self):
         self.copy(pattern="LICENSE*", dst="licenses", src=self._source_subfolder)
