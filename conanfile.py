@@ -48,7 +48,6 @@ class LibuvConan(ConanFile):
 
             if tools.os_info.is_windows and \
                (self.settings.compiler == "gcc" or self.settings.compiler == "clang"):
-                # todo: check for shared/static, arch,...
                 self.run("./autogen.sh", win_bash=True)
                 from conans import AutoToolsBuildEnvironment
                 autotools = AutoToolsBuildEnvironment(self, win_bash=True)
