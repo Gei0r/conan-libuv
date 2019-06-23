@@ -19,9 +19,9 @@ environment:
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           MINGW_CONFIGURATIONS:
             8@x86_64@seh@win32,
-            8@x86@seh@win32,
+            8@x86@dwarf2@win32,
             8@x86_64@seh@posix,
-            8@x86@seh@posix
+            8@x86@dwarf2@posix
 
 install:
   - set PATH=C:/msys64/mingw64/bin;C:/msys64/usr/bin;%PYTHON%;%PYTHON%/Scripts/;%PATH%
